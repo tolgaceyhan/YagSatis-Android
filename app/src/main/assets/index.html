@@ -269,7 +269,7 @@ dialog{border:0;border-radius:18px;padding:0;max-width:560px;width:calc(100vw - 
       </section>
       <section class="card">
         <div class="card-title">Android Geçiş Notu</div>
-        <div class="notice info">Arayüz mobil önceliklidir ve veri erişimi tek <span class="kbd">StorageAdapter</span> katmanından yapılır. Capacitor paketi içinde aynı kod kullanılabilir. Üretim Android sürümünde yoğun veri için LocalStorage yerine SQLite adaptörü eklenmesi önerilir.</div>
+        <div class="notice info">Android sürümünde veriler gerçek SQLite veritabanında saklanır. v1.0 sürümündeki WebView LocalStorage kayıtları, SQLite boşsa ilk açılışta otomatik olarak SQLite'a taşınır. JSON yedekleme ve geri yükleme desteği devam eder.</div>
       </section>
     </section>
   </main>
@@ -305,25 +305,72 @@ const normalizeText=s=>String(s||'').toLocaleLowerCase('tr-TR');
 
 const StorageAdapter={
   async get(key){
+    const k=String(key);
+    try{
+      const bridge=globalThis.AndroidBridge;
+      if(bridge?.getItem){
+        const dbValue=bridge.getItem(k);
+        if(dbValue!==null&&dbValue!==undefined&&dbValue!=='null') return String(dbValue);
+
+        // v1.0 -> v1.1 otomatik geçiş:
+        // SQLite boşsa aynı uygulamanın eski WebView LocalStorage kaydını bir kez SQLite'a taşı.
+        const legacy=localStorage.getItem(k);
+        if(legacy!==null){
+          const ok=bridge.setItem(k,String(legacy));
+          if(ok!==false) return legacy;
+        }
+        return null;
+      }
+    }catch(e){console.warn('Android SQLite okunamadı.',e)}
+
     try{
       const prefs=globalThis.Capacitor?.Plugins?.Preferences;
-      if(prefs){const r=await prefs.get({key});return r?.value??null;}
+      if(prefs){const r=await prefs.get({key:k});return r?.value??null;}
     }catch(e){console.warn('Capacitor Preferences okunamadı, LocalStorage kullanılacak.',e)}
-    try{return localStorage.getItem(key)}catch(e){console.error('LocalStorage okunamadı',e);return null}
+
+    try{return localStorage.getItem(k)}catch(e){console.error('LocalStorage okunamadı',e);return null}
   },
   async set(key,value){
-    const text=String(value);
+    const k=String(key),text=String(value);
+    try{
+      const bridge=globalThis.AndroidBridge;
+      if(bridge?.setItem){
+        const ok=bridge.setItem(k,text);
+        if(ok===false) throw new Error('SQLite yazma işlemi başarısız');
+        return;
+      }
+    }catch(e){console.error('Android SQLite yazılamadı',e);throw e}
+
     try{
       const prefs=globalThis.Capacitor?.Plugins?.Preferences;
-      if(prefs){await prefs.set({key,value:text});return;}
+      if(prefs){await prefs.set({key:k,value:text});return;}
     }catch(e){console.warn('Capacitor Preferences yazılamadı, LocalStorage kullanılacak.',e)}
-    localStorage.setItem(key,text);
+
+    localStorage.setItem(k,text);
   },
   async remove(key){
-    try{const prefs=globalThis.Capacitor?.Plugins?.Preferences;if(prefs){await prefs.remove({key});return;}}catch(e){console.warn(e)}
-    localStorage.removeItem(key);
+    const k=String(key);
+    try{
+      const bridge=globalThis.AndroidBridge;
+      if(bridge?.removeItem){
+        const ok=bridge.removeItem(k);
+        if(ok===false) throw new Error('SQLite silme işlemi başarısız');
+        return;
+      }
+    }catch(e){console.error('Android SQLite kaydı silinemedi',e);throw e}
+
+    try{
+      const prefs=globalThis.Capacitor?.Plugins?.Preferences;
+      if(prefs){await prefs.remove({key:k});return;}
+    }catch(e){console.warn(e)}
+
+    localStorage.removeItem(k);
   },
-  engine(){if(globalThis.Capacitor?.Plugins?.Preferences)return 'Capacitor Preferences';if(globalThis.AndroidBridge)return 'Android WebView Yerel Veri';return 'Web LocalStorage'}
+  engine(){
+    if(globalThis.AndroidBridge?.getItem)return 'Android SQLite';
+    if(globalThis.Capacitor?.Plugins?.Preferences)return 'Capacitor Preferences';
+    return 'Web LocalStorage';
+  }
 };
 
 function defaultState(){

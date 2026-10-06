@@ -25,6 +25,7 @@ public class MainActivity extends Activity {
     private static final int REQUEST_CREATE_BACKUP = 1002;
 
     private WebView webView;
+    private AppDatabaseHelper database;
     private ValueCallback<Uri[]> filePathCallback;
     private String pendingBackupText;
 
@@ -40,6 +41,9 @@ public class MainActivity extends Activity {
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
         setContentView(webView);
+
+        database = new AppDatabaseHelper(getApplicationContext());
+        database.getWritableDatabase();
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -83,6 +87,9 @@ public class MainActivity extends Activity {
         if (webView != null) {
             webView.removeJavascriptInterface("AndroidBridge");
             webView.destroy();
+        }
+        if (database != null) {
+            database.close();
         }
         super.onDestroy();
     }
@@ -134,6 +141,38 @@ public class MainActivity extends Activity {
     }
 
     public final class AndroidBridge {
+        @JavascriptInterface
+        public String getItem(String key) {
+            if (key == null || database == null) return null;
+            try {
+                return database.getValue(key);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        @JavascriptInterface
+        public boolean setItem(String key, String value) {
+            if (key == null || database == null) return false;
+            try {
+                database.setValue(key, value == null ? "" : value);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        @JavascriptInterface
+        public boolean removeItem(String key) {
+            if (key == null || database == null) return false;
+            try {
+                database.removeValue(key);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
         @JavascriptInterface
         public void saveTextFile(String fileName, String content) {
             pendingBackupText = content == null ? "" : content;
