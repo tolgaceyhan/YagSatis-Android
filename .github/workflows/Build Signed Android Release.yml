@@ -82,17 +82,17 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/release/app-release.apk dist/YagSatis-v1.1.1-release.apk
-          cp app/build/outputs/bundle/release/app-release.aab dist/YagSatis-v1.1.1-release.aab
+          cp app/build/outputs/apk/release/app-release.apk dist/YagSatis-v1.1.2-release.apk
+          cp app/build/outputs/bundle/release/app-release.aab dist/YagSatis-v1.1.2-release.aab
           sha256sum dist/* > dist/SHA256SUMS.txt
 
       - name: Release dosyalarini artifact olarak yukle
         uses: actions/upload-artifact@v4
         with:
-          name: YagSatis-Android-SIGNED-v1.1.1
+          name: YagSatis-Android-SIGNED-v1.1.2
           path: |
-            dist/YagSatis-v1.1.1-release.apk
-            dist/YagSatis-v1.1.1-release.aab
+            dist/YagSatis-v1.1.2-release.apk
+            dist/YagSatis-v1.1.2-release.aab
             dist/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 90
