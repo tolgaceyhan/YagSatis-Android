@@ -2,6 +2,11 @@ plugins {
     id 'com.android.application'
 }
 
+def releaseKeystorePath = System.getenv('YAGSATIS_KEYSTORE_PATH')
+def releaseStorePassword = System.getenv('YAGSATIS_KEYSTORE_PASSWORD')
+def releaseKeyAlias = System.getenv('YAGSATIS_KEY_ALIAS')
+def releaseKeyPassword = System.getenv('YAGSATIS_KEY_PASSWORD')
+
 android {
     namespace 'com.yagsatis.mobile'
     compileSdk 35
@@ -10,12 +15,26 @@ android {
         applicationId 'com.yagsatis.mobile'
         minSdk 24
         targetSdk 35
-        versionCode 2
-        versionName '1.1.0'
+        versionCode 3
+        versionName '1.1.1'
+    }
+
+    signingConfigs {
+        release {
+            if (releaseKeystorePath && releaseStorePassword && releaseKeyAlias && releaseKeyPassword) {
+                storeFile file(releaseKeystorePath)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
     }
 
     buildTypes {
         release {
+            if (releaseKeystorePath && releaseStorePassword && releaseKeyAlias && releaseKeyPassword) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

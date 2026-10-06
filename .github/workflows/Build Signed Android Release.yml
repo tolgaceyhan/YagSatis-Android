@@ -1,0 +1,98 @@
+name: Build Signed Android Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Kaynak kodu al
+        uses: actions/checkout@v7
+
+      - name: Java 17 kur
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK kur
+        uses: android-actions/setup-android@v4
+
+      - name: Android API 35 ve Build Tools kur
+        shell: bash
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Proje yapisini dogrula
+        shell: bash
+        run: |
+          test -f app/build.gradle || (echo "HATA: app/build.gradle bulunamadi" && exit 1)
+          test -f app/src/main/AndroidManifest.xml || (echo "HATA: AndroidManifest.xml bulunamadi" && exit 1)
+          test -f app/src/main/java/com/yagsatis/mobile/AppDatabaseHelper.java || (echo "HATA: AppDatabaseHelper.java bulunamadi" && exit 1)
+
+      - name: Gradle 8.9 kur
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.9'
+          validate-wrappers: false
+          cache-provider: basic
+
+      - name: Signing secret'larini dogrula
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.YAGSATIS_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.YAGSATIS_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.YAGSATIS_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.YAGSATIS_KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE_BASE64" || (echo "HATA: YAGSATIS_KEYSTORE_BASE64 secret eksik" && exit 1)
+          test -n "$STORE_PASSWORD" || (echo "HATA: YAGSATIS_KEYSTORE_PASSWORD secret eksik" && exit 1)
+          test -n "$KEY_ALIAS" || (echo "HATA: YAGSATIS_KEY_ALIAS secret eksik" && exit 1)
+          test -n "$KEY_PASSWORD" || (echo "HATA: YAGSATIS_KEY_PASSWORD secret eksik" && exit 1)
+
+      - name: Release keystore hazirla
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.YAGSATIS_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.YAGSATIS_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.YAGSATIS_KEY_ALIAS }}
+        run: |
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/yagsatis-release.jks"
+          keytool -list -keystore "$RUNNER_TEMP/yagsatis-release.jks" -alias "$KEY_ALIAS" -storepass "$STORE_PASSWORD" >/dev/null
+
+      - name: Imzali Release APK ve AAB derle
+        env:
+          YAGSATIS_KEYSTORE_PATH: ${{ runner.temp }}/yagsatis-release.jks
+          YAGSATIS_KEYSTORE_PASSWORD: ${{ secrets.YAGSATIS_KEYSTORE_PASSWORD }}
+          YAGSATIS_KEY_ALIAS: ${{ secrets.YAGSATIS_KEY_ALIAS }}
+          YAGSATIS_KEY_PASSWORD: ${{ secrets.YAGSATIS_KEY_PASSWORD }}
+        run: gradle :app:assembleRelease :app:bundleRelease --stacktrace
+
+      - name: Release imzasini dogrula
+        shell: bash
+        run: |
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs app/build/outputs/apk/release/app-release.apk
+
+      - name: Release dosyalarini hazirla
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/release/app-release.apk dist/YagSatis-v1.1.1-release.apk
+          cp app/build/outputs/bundle/release/app-release.aab dist/YagSatis-v1.1.1-release.aab
+          sha256sum dist/* > dist/SHA256SUMS.txt
+
+      - name: Release dosyalarini artifact olarak yukle
+        uses: actions/upload-artifact@v4
+        with:
+          name: YagSatis-Android-SIGNED-v1.1.1
+          path: |
+            dist/YagSatis-v1.1.1-release.apk
+            dist/YagSatis-v1.1.1-release.aab
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 90
