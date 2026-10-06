@@ -42,35 +42,59 @@ jobs:
           validate-wrappers: false
           cache-provider: basic
 
-      - name: Signing secret'larini dogrula
+      - name: Release imza anahtarini hazirla ve dogrula
         shell: bash
         env:
-          KEYSTORE_BASE64: ${{ secrets.YAGSATIS_KEYSTORE_BASE64 }}
-          STORE_PASSWORD: ${{ secrets.YAGSATIS_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.YAGSATIS_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.YAGSATIS_KEY_PASSWORD }}
+          RAW_KEYSTORE_BASE64: ${{ secrets.YAGSATIS_KEYSTORE_BASE64 }}
+          RAW_STORE_PASSWORD: ${{ secrets.YAGSATIS_KEYSTORE_PASSWORD }}
+          RAW_KEY_ALIAS: ${{ secrets.YAGSATIS_KEY_ALIAS }}
+          RAW_KEY_PASSWORD: ${{ secrets.YAGSATIS_KEY_PASSWORD }}
         run: |
-          test -n "$KEYSTORE_BASE64" || (echo "HATA: YAGSATIS_KEYSTORE_BASE64 secret eksik" && exit 1)
-          test -n "$STORE_PASSWORD" || (echo "HATA: YAGSATIS_KEYSTORE_PASSWORD secret eksik" && exit 1)
-          test -n "$KEY_ALIAS" || (echo "HATA: YAGSATIS_KEY_ALIAS secret eksik" && exit 1)
-          test -n "$KEY_PASSWORD" || (echo "HATA: YAGSATIS_KEY_PASSWORD secret eksik" && exit 1)
+          set -euo pipefail
 
-      - name: Release keystore hazirla
-        shell: bash
-        env:
-          KEYSTORE_BASE64: ${{ secrets.YAGSATIS_KEYSTORE_BASE64 }}
-          STORE_PASSWORD: ${{ secrets.YAGSATIS_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.YAGSATIS_KEY_ALIAS }}
-        run: |
+          extract_value() {
+            local raw="$1"
+            local name="$2"
+            raw="${raw//$'\r'/}"
+            if printf '%s\n' "$raw" | grep -q "^$name="; then
+              printf '%s\n' "$raw" | sed -n "s/^$name=//p" | head -n 1
+            else
+              printf '%s' "$raw"
+            fi
+          }
+
+          KEYSTORE_BASE64="$(extract_value "$RAW_KEYSTORE_BASE64" "YAGSATIS_KEYSTORE_BASE64" | tr -d '[:space:]')"
+          STORE_PASSWORD="$(extract_value "$RAW_STORE_PASSWORD" "YAGSATIS_KEYSTORE_PASSWORD")"
+          KEY_ALIAS="$(extract_value "$RAW_KEY_ALIAS" "YAGSATIS_KEY_ALIAS")"
+          KEY_PASSWORD="$(extract_value "$RAW_KEY_PASSWORD" "YAGSATIS_KEY_PASSWORD")"
+
+          test -n "$KEYSTORE_BASE64" || (echo "HATA: YAGSATIS_KEYSTORE_BASE64 secret bos veya hatali" && exit 1)
+          test -n "$STORE_PASSWORD" || (echo "HATA: YAGSATIS_KEYSTORE_PASSWORD secret bos veya hatali" && exit 1)
+          test -n "$KEY_ALIAS" || (echo "HATA: YAGSATIS_KEY_ALIAS secret bos veya hatali" && exit 1)
+          test -n "$KEY_PASSWORD" || (echo "HATA: YAGSATIS_KEY_PASSWORD secret bos veya hatali" && exit 1)
+
           printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/yagsatis-release.jks"
-          keytool -list -keystore "$RUNNER_TEMP/yagsatis-release.jks" -alias "$KEY_ALIAS" -storepass "$STORE_PASSWORD" >/dev/null
+          test -s "$RUNNER_TEMP/yagsatis-release.jks" || (echo "HATA: Keystore dosyasi olusturulamadi" && exit 1)
+
+          keytool -list \
+            -keystore "$RUNNER_TEMP/yagsatis-release.jks" \
+            -alias "$KEY_ALIAS" \
+            -storepass "$STORE_PASSWORD" >/dev/null
+
+          echo "::add-mask::$STORE_PASSWORD"
+          echo "::add-mask::$KEY_PASSWORD"
+          echo "::add-mask::$KEY_ALIAS"
+
+          {
+            echo "YAGSATIS_KEYSTORE_PATH=$RUNNER_TEMP/yagsatis-release.jks"
+            echo "YAGSATIS_KEYSTORE_PASSWORD=$STORE_PASSWORD"
+            echo "YAGSATIS_KEY_ALIAS=$KEY_ALIAS"
+            echo "YAGSATIS_KEY_PASSWORD=$KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
+
+          echo "Release keystore dogrulandi."
 
       - name: Imzali Release APK ve AAB derle
-        env:
-          YAGSATIS_KEYSTORE_PATH: ${{ runner.temp }}/yagsatis-release.jks
-          YAGSATIS_KEYSTORE_PASSWORD: ${{ secrets.YAGSATIS_KEYSTORE_PASSWORD }}
-          YAGSATIS_KEY_ALIAS: ${{ secrets.YAGSATIS_KEY_ALIAS }}
-          YAGSATIS_KEY_PASSWORD: ${{ secrets.YAGSATIS_KEY_PASSWORD }}
         run: gradle :app:assembleRelease :app:bundleRelease --stacktrace
 
       - name: Release imzasini dogrula
