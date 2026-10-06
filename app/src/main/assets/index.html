@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Yağ Satış & Kampanya Yönetimi</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f3f6fb;--surface:#fff;--surface-2:#f8fafc;--text:#0f172a;--muted:#64748b;
+  --line:#e2e8f0;--primary:#155eef;--primary-2:#0b4ad1;--success:#087443;--warning:#b54708;
+  --danger:#b42318;--nav:#0b1220;--shadow:0 8px 28px rgba(15,23,42,.07);--radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.55}
+.appbar{position:sticky;top:0;z-index:20;min-height:72px;background:linear-gradient(135deg,#0b1220,#13233b);color:#fff;display:flex;align-items:center;gap:12px;padding:12px max(16px,env(safe-area-inset-right)) 12px max(16px,env(safe-area-inset-left));box-shadow:0 6px 20px rgba(2,6,23,.18)}
+.appbar-brand{min-width:0;flex:1}.appbar h1{font-size:20px;line-height:1.2;margin:0;font-weight:800;letter-spacing:-.02em}.appbar .sub{font-size:12px;color:#cbd5e1;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon-btn{width:44px;height:44px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.08);color:#fff;margin:0;display:grid;place-items:center;font-size:21px}
+.app-shell{display:grid;grid-template-columns:250px minmax(0,900px);justify-content:center;gap:18px;max-width:1190px;margin:0 auto;padding:18px}
+.sidebar{position:sticky;top:90px;align-self:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px}
+.nav-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;padding:10px 11px 6px}
+.nav-btn{width:100%;border:0;background:transparent;color:#334155;text-align:left;border-radius:12px;padding:12px 11px;margin:2px 0;font-weight:700;display:flex;align-items:center;gap:10px}
+.nav-btn:hover{background:#f1f5f9}.nav-btn.active{background:#edf4ff;color:var(--primary)}
+.nav-icon{width:24px;text-align:center}
+.content{min-width:0}.page{display:none}.page.active{display:block}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:2px 0 14px}.page-head h2{font-size:24px;letter-spacing:-.03em;margin:0}.page-head p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:17px;margin-bottom:14px}
+.card-title{font-size:16px;font-weight:800;margin:0 0 13px;display:flex;align-items:center;gap:9px}.step{width:29px;height:29px;border-radius:10px;background:#eaf1ff;color:var(--primary);display:inline-grid;place-items:center;font-size:13px;font-weight:900}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.field{min-width:0}.field.full{grid-column:1/-1}
+label{display:block;font-size:12px;font-weight:750;color:#475569;margin:0 0 6px}
+input,select,textarea{width:100%;min-height:44px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;color:var(--text);padding:10px 11px;outline:none;transition:border-color .15s,box-shadow .15s}
+textarea{min-height:82px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:#74a4ff;box-shadow:0 0 0 3px rgba(21,94,239,.10)}
+input[readonly]{background:#f8fafc;color:#475569}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.actions>*{flex:1 1 140px}
+.btn{border:0;border-radius:12px;min-height:44px;padding:10px 14px;font-weight:800;background:var(--primary);color:#fff}.btn:hover{background:var(--primary-2)}
+.btn.secondary{background:#eef2f7;color:#1e293b}.btn.secondary:hover{background:#e2e8f0}.btn.danger{background:#fff1f0;color:var(--danger);border:1px solid #fecaca}.btn.success{background:#087443}.btn.ghost{background:transparent;color:#334155;border:1px solid var(--line)}
+.helper{font-size:12px;color:var(--muted);line-height:1.5;margin-top:7px}.notice{border-radius:13px;padding:10px 12px;font-size:12px;line-height:1.5;background:#f8fafc;border:1px solid var(--line);color:#475569}.notice.info{background:#eff6ff;border-color:#bfdbfe;color:#1e40af}.notice.warn{background:#fffbeb;border-color:#fde68a;color:#92400e}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}.stat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:800}.stat .v{font-size:19px;font-weight:850;margin-top:6px;letter-spacing:-.02em}.stat .hint{font-size:11px;color:var(--muted);margin-top:3px}
+.product-preview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}.metric{border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:10px}.metric .k{font-size:11px;color:var(--muted)}.metric .v{font-size:14px;font-weight:800;margin-top:3px;overflow-wrap:anywhere}.metric .v.good{color:var(--success)}.metric .v.bad{color:var(--danger)}
+.free-row{display:grid;grid-template-columns:minmax(0,1fr) 110px 44px;gap:8px;margin-top:8px}.free-row .btn{padding:0;min-height:44px}
+.cart-item,.list-item{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fff;margin-top:9px}.cart-item:first-child,.list-item:first-child{margin-top:0}.item-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.item-title{font-weight:850}.item-amount{font-weight:850;text-align:right}.meta{font-size:12px;color:var(--muted);line-height:1.55;margin-top:4px}.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800;background:#f1f5f9;color:#475569}.badge.success{background:#ecfdf3;color:#087443}.badge.warn{background:#fffaeb;color:#b54708}.badge.danger{background:#fff1f0;color:#b42318}.badge.blue{background:#eff6ff;color:#1d4ed8}
+.row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}.row:last-child{border-bottom:0}.row .value{font-weight:800;text-align:right}.profit{color:var(--success)}.negative{color:var(--danger)}
+.summary{background:#f8fbff;border:1px solid #cfe0ff;border-radius:14px;padding:12px;margin-top:12px}.summary .row{padding:7px 0}.summary .total{font-size:17px;font-weight:900}
+.search{position:relative;margin-bottom:10px}.search input{padding-left:38px}.search::before{content:"⌕";position:absolute;left:13px;top:9px;font-size:20px;color:#94a3b8;z-index:1}
+.empty{padding:22px 12px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed #cbd5e1;border-radius:13px;background:#fafcff}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}table{border-collapse:collapse;width:100%;min-width:650px;background:#fff}th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);font-size:12px;vertical-align:top}th{position:sticky;top:0;background:#f8fafc;color:#475569;font-weight:850}tr:last-child td{border-bottom:0}
+.stock-positive{color:var(--success);font-weight:800}.stock-low{color:var(--warning);font-weight:800}.stock-zero{color:var(--danger);font-weight:800}
+.bottom-action{position:sticky;bottom:max(10px,env(safe-area-inset-bottom));z-index:8;margin-top:12px}.bottom-action .btn{box-shadow:0 10px 28px rgba(21,94,239,.24);min-height:52px;font-size:15px}
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(2,6,23,.58);z-index:29}.drawer{display:none}.desktop-only{display:block}.mobile-only{display:none}
+.toast-wrap{position:fixed;right:18px;bottom:18px;z-index:80;display:grid;gap:8px;max-width:min(390px,calc(100vw - 24px))}.toast{background:#0f172a;color:#fff;border-radius:13px;padding:12px 14px;font-size:13px;box-shadow:0 14px 38px rgba(2,6,23,.28);animation:toastIn .18s ease}.toast.success{background:#065f46}.toast.error{background:#991b1b}@keyframes toastIn{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+dialog{border:0;border-radius:18px;padding:0;max-width:560px;width:calc(100vw - 24px);box-shadow:0 24px 70px rgba(2,6,23,.32)}dialog::backdrop{background:rgba(2,6,23,.55)}.dialog-body{padding:18px}.dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.dialog-head h3{margin:0;font-size:18px}.xbtn{border:0;background:#eef2f7;color:#334155;border-radius:10px;width:38px;height:38px;font-size:20px}
+.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:2px 5px}
+@media(max-width:900px){
+ .app-shell{display:block;padding:12px}.sidebar{display:none}.mobile-only{display:block}.desktop-only{display:none}
+ .drawer{display:block;position:fixed;top:0;right:-330px;width:min(310px,88vw);height:100dvh;background:#fff;z-index:30;padding:calc(12px + env(safe-area-inset-top)) 12px 18px;transition:right .2s ease;overflow:auto;box-shadow:-18px 0 40px rgba(2,6,23,.22)}.drawer.open{right:0}.drawer-overlay.open{display:block}
+ .drawer-head{display:flex;justify-content:space-between;align-items:center;padding:4px 2px 10px}.drawer-head strong{font-size:18px}.drawer .nav-btn{min-height:48px}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}.product-preview{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+ .appbar{min-height:66px;padding-top:max(10px,env(safe-area-inset-top))}.appbar h1{font-size:17px}.appbar .sub{font-size:11px}
+ .app-shell{padding:10px}.card{padding:13px;border-radius:15px;margin-bottom:10px}.page-head{margin:2px 2px 10px}.page-head h2{font-size:21px}
+ .grid,.grid-3{grid-template-columns:1fr}.stats{gap:7px}.stat{padding:11px}.stat .v{font-size:16px}.product-preview{gap:7px}.free-row{grid-template-columns:minmax(0,1fr) 92px 44px}
+ .actions{display:grid;grid-template-columns:1fr 1fr}.actions>*{min-width:0}.actions .wide{grid-column:1/-1}
+ .item-head{gap:8px}.item-title,.item-amount{font-size:13px}.bottom-action{bottom:max(7px,env(safe-area-inset-bottom))}
+}
+@media print{.appbar,.sidebar,.drawer,.drawer-overlay,.actions,.bottom-action,.nav-btn,.btn,.mobile-only{display:none!important}.app-shell{display:block;max-width:none;padding:0}.page{display:none!important}.page.active{display:block!important}.card,.stat{box-shadow:none;break-inside:avoid}.content{width:100%}}
+</style>
+</head>
+<body>
+<header class="appbar">
+  <button class="icon-btn mobile-only" id="menuBtn" aria-label="Menüyü aç">☰</button>
+  <div class="appbar-brand">
+    <h1>Yağ Satış & Kampanya Yönetimi</h1>
+    <div class="sub">Satış • stok • kampanya • cari • tahsilat</div>
+  </div>
+  <button class="icon-btn" id="quickBackup" aria-label="Hızlı yedek al" title="Hızlı yedek al">⇩</button>
+</header>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="drawer" aria-label="Mobil menü">
+  <div class="drawer-head"><strong>Menü</strong><button class="xbtn" id="closeDrawer" aria-label="Menüyü kapat">×</button></div>
+  <div id="mobileNav"></div>
+</aside>
+
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Ana menü">
+    <div class="nav-title">Yönetim</div>
+    <div id="desktopNav"></div>
+  </aside>
+
+  <main class="content">
+    <section class="page active" id="salePage">
+      <div class="page-head"><div><h2>Yeni Satış</h2><p>Ürünleri sepete ekleyin, tahsilatı belirleyin ve tek fiş olarak kaydedin.</p></div><span class="badge blue" id="storageBadge">Yerel veri</span></div>
+
+      <div class="stats">
+        <div class="stat"><div class="k">Bugünkü Satış</div><div class="v" id="todayRevenue">0,00 TL</div><div class="hint" id="todaySalesCount">0 fiş</div></div>
+        <div class="stat"><div class="k">Bugünkü Kâr</div><div class="v" id="todayProfit">0,00 TL</div><div class="hint">Brüt kâr</div></div>
+        <div class="stat"><div class="k">Açık Cari</div><div class="v" id="topOpenBalance">0,00 TL</div><div class="hint">Tüm müşteriler</div></div>
+        <div class="stat"><div class="k">Stok Alarmı</div><div class="v" id="lowStockCount">0</div><div class="hint">≤ 5 adet</div></div>
+      </div>
+
+      <section class="card">
+        <div class="card-title"><span class="step">1</span>Müşteri ve Ürün</div>
+        <div class="grid">
+          <div class="field"><label for="saleCustomer">Müşteri</label><select id="saleCustomer"></select><div class="helper">Peşin/kart satışında genel satış kullanılabilir. Cari satışta müşteri zorunludur.</div></div>
+          <div class="field"><label for="brand">Marka</label><select id="brand"></select></div>
+          <div class="field"><label for="product">Ürün</label><select id="product"></select></div>
+          <div class="field"><label for="stockStatus">Stok durumu</label><input id="stockStatus" readonly></div>
+          <div class="field"><label for="cost">KDV dahil maliyet (TL)</label><input id="cost" type="number" min="0" step="0.01" inputmode="decimal"></div>
+          <div class="field"><label for="price">Satış fiyatı (TL)</label><input id="price" type="number" min="0" step="0.01" inputmode="decimal"></div>
+        </div>
+        <div class="product-preview">
+          <div class="metric"><div class="k">Mevcut stok</div><div class="v" id="previewStock">0 adet</div></div>
+          <div class="metric"><div class="k">Teslim</div><div class="v" id="previewDelivery">0 adet</div></div>
+          <div class="metric"><div class="k">Ciro</div><div class="v" id="previewRevenue">0,00 TL</div></div>
+          <div class="metric"><div class="k">Brüt kâr</div><div class="v good" id="previewProfit">0,00 TL</div></div>
+        </div>
+        <div class="actions"><button class="btn secondary" id="saveProductChanges">Ürün Fiyatlarını Kaydet</button><button class="btn ghost" id="goStock">Stok Yönetimine Git</button></div>
+      </section>
+
+      <section class="card">
+        <div class="card-title"><span class="step">2</span>Adet ve Bedelsiz Ürünler</div>
+        <div class="grid">
+          <div class="field"><label for="saleQty">Satılacak ücretli adet</label><input id="saleQty" type="number" min="1" step="1" value="1" inputmode="numeric"></div>
+          <div class="field"><label>Bedelsiz toplam</label><input id="freeTotal" readonly value="0 adet"></div>
+        </div>
+        <div id="freeItems"></div>
+        <div class="actions"><button class="btn secondary" id="addFreeItem">+ Bedelsiz Ürün Ekle</button></div>
+        <div class="notice info" style="margin-top:10px">Bedelsiz ürün, ücretli üründen farklı olabilir. Birden fazla ürün eklenebilir ve her ürünün maliyeti ayrı hesaplanır.</div>
+      </section>
+
+      <section class="card">
+        <div class="card-title"><span class="step">3</span>Sepet</div>
+        <div id="cartList"></div>
+        <div id="cartEmpty" class="empty">Sepet boş. Ürün ve adet seçip sepete ekleyin.</div>
+        <div class="summary" id="cartSummary" hidden>
+          <div class="row"><span>Kalem sayısı</span><span class="value" id="cartLineCount">0</span></div>
+          <div class="row"><span>Toplam teslim</span><span class="value" id="cartDelivery">0 adet</span></div>
+          <div class="row"><span>Toplam maliyet</span><span class="value" id="cartCost">0,00 TL</span></div>
+          <div class="row"><span>Toplam ciro</span><span class="value" id="cartRevenue">0,00 TL</span></div>
+          <div class="row"><span>Toplam kâr</span><span class="value profit total" id="cartProfit">0,00 TL</span></div>
+        </div>
+        <div class="actions"><button class="btn" id="addToCart">Sepete Ekle</button><button class="btn secondary" id="clearCart">Sepeti Temizle</button></div>
+      </section>
+
+      <section class="card">
+        <div class="card-title"><span class="step">4</span>Ödeme</div>
+        <div class="grid">
+          <div class="field"><label for="paymentMethod">Ödeme şekli</label><select id="paymentMethod"><option value="cash">Peşin / Nakit</option><option value="card">Kredi Kartı</option><option value="credit">Cari / Vadeli</option></select></div>
+          <div class="field"><label for="paidAmount">Tahsil edilen (TL)</label><input id="paidAmount" type="number" min="0" step="0.01" inputmode="decimal" value="0"></div>
+          <div class="field"><label for="balanceAmount">Kalan bakiye</label><input id="balanceAmount" readonly value="0,00 TL"></div>
+          <div class="field"><label for="saleNote">Satış notu</label><input id="saleNote" maxlength="180" placeholder="İsteğe bağlı"></div>
+        </div>
+        <div class="helper">Stok, yalnızca satış tamamlandığında tek işlem olarak düşülür.</div>
+      </section>
+
+      <div class="bottom-action"><button class="btn wide" id="completeSale">Satışı Tamamla ve Stoktan Düş</button></div>
+    </section>
+
+    <section class="page" id="stockPage">
+      <div class="page-head"><div><h2>Stok Yönetimi</h2><p>Stok giriş/çıkışlarını işlem kaydıyla takip edin.</p></div></div>
+      <section class="card">
+        <div class="grid">
+          <div class="field"><label for="stockProduct">Ürün</label><select id="stockProduct"></select></div>
+          <div class="field"><label>Mevcut stok</label><input id="stockCurrent" readonly></div>
+          <div class="field"><label for="stockAdd">Stok ekle</label><input id="stockAdd" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+          <div class="field"><label for="stockRemove">Stok çıkar</label><input id="stockRemove" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+          <div class="field full"><label for="stockNote">Açıklama</label><input id="stockNote" maxlength="160" placeholder="Örn. depo girişi / sayım düzeltmesi"></div>
+        </div>
+        <div class="actions"><button class="btn" id="updateStock">Stoku Güncelle</button></div>
+      </section>
+      <section class="card"><div class="card-title">Ürün Stokları</div><div class="search"><input id="stockSearch" placeholder="Ürün veya marka ara"></div><div id="stockList"></div></section>
+      <section class="card"><div class="card-title">Son Stok Hareketleri</div><div id="stockMovesList"></div></section>
+    </section>
+
+    <section class="page" id="productsPage">
+      <div class="page-head"><div><h2>Ürünler</h2><p>Ürün kartlarını kalıcı kimliklerle yönetin.</p></div></div>
+      <section class="card">
+        <div class="card-title" id="productFormTitle">Yeni Ürün</div>
+        <input id="editProductId" type="hidden">
+        <div class="grid">
+          <div class="field"><label for="newBrand">Marka</label><input id="newBrand" maxlength="60" placeholder="Örn. Brava"></div>
+          <div class="field"><label for="newName">Ürün adı</label><input id="newName" maxlength="100" placeholder="Örn. 10W-40 Tam Sentetik"></div>
+          <div class="field"><label for="newCost">KDV dahil maliyet</label><input id="newCost" type="number" min="0" step="0.01" inputmode="decimal"></div>
+          <div class="field"><label for="newPrice">Satış fiyatı</label><input id="newPrice" type="number" min="0" step="0.01" inputmode="decimal"></div>
+          <div class="field"><label for="newStock">Başlangıç / mevcut stok</label><input id="newStock" type="number" min="0" step="1" inputmode="numeric"></div>
+        </div>
+        <div class="actions"><button class="btn" id="saveProductForm">Ürünü Kaydet</button><button class="btn secondary" id="cancelProductEdit" hidden>Düzenlemeyi İptal Et</button></div>
+      </section>
+      <section class="card"><div class="search"><input id="productSearch" placeholder="Ürün veya marka ara"></div><div id="productList"></div></section>
+    </section>
+
+    <section class="page" id="customersPage">
+      <div class="page-head"><div><h2>Müşteriler</h2><p>Müşteri kartları satış ve cari geçmişinden bağımsız, sabit ID ile saklanır.</p></div></div>
+      <section class="card">
+        <div class="card-title" id="customerFormTitle">Yeni Müşteri</div><input id="editCustomerId" type="hidden">
+        <div class="grid">
+          <div class="field"><label for="customerName">Müşteri / Firma</label><input id="customerName" maxlength="100"></div>
+          <div class="field"><label for="customerPhone">Telefon</label><input id="customerPhone" type="tel" maxlength="30"></div>
+          <div class="field"><label for="customerContact">Yetkili kişi</label><input id="customerContact" maxlength="80"></div>
+          <div class="field"><label for="customerTax">Vergi No / T.C.</label><input id="customerTax" maxlength="20"></div>
+          <div class="field full"><label for="customerAddress">Adres</label><input id="customerAddress" maxlength="180"></div>
+          <div class="field full"><label for="customerNote">Not</label><textarea id="customerNote" maxlength="300"></textarea></div>
+        </div>
+        <div class="actions"><button class="btn" id="saveCustomer">Müşteriyi Kaydet</button><button class="btn secondary" id="cancelCustomerEdit" hidden>Düzenlemeyi İptal Et</button></div>
+      </section>
+      <section class="card"><div class="search"><input id="customerSearch" placeholder="Müşteri, telefon veya yetkili ara"></div><div id="customerList"></div></section>
+    </section>
+
+    <section class="page" id="salesPage">
+      <div class="page-head"><div><h2>Satış Geçmişi</h2><p>Tamamlanmış satışlar denetlenebilirlik için değiştirilmez; yanlış satış iptal edilerek stok geri alınır.</p></div></div>
+      <section class="card">
+        <div class="grid">
+          <div class="field"><label for="salesCustomerFilter">Müşteri</label><select id="salesCustomerFilter"></select></div>
+          <div class="field"><label for="salesSearch">Fiş / ürün ara</label><input id="salesSearch" placeholder="Örn. YK-... veya 10W-40"></div>
+        </div>
+      </section>
+      <div id="salesList"></div>
+    </section>
+
+    <section class="page" id="accountPage">
+      <div class="page-head"><div><h2>Cari / Muhasebe</h2><p>Satış anı tahsilatları ve sonradan alınan tahsilatlar birlikte hesaplanır.</p></div></div>
+      <div class="stats">
+        <div class="stat"><div class="k">Toplam Satış</div><div class="v" id="accountSales">0,00 TL</div></div>
+        <div class="stat"><div class="k">Toplam Tahsilat</div><div class="v" id="accountCollected">0,00 TL</div></div>
+        <div class="stat"><div class="k">Açık Bakiye</div><div class="v" id="accountBalance">0,00 TL</div></div>
+        <div class="stat"><div class="k">Cari Müşteri</div><div class="v" id="accountCustomerCount">0</div></div>
+      </div>
+      <section class="card">
+        <div class="card-title">Tahsilat Ekle</div>
+        <div class="grid">
+          <div class="field"><label for="collectionCustomer">Müşteri</label><select id="collectionCustomer"></select></div>
+          <div class="field"><label for="collectionAmount">Tutar</label><input id="collectionAmount" type="number" min="0" step="0.01" inputmode="decimal"></div>
+          <div class="field"><label for="collectionMethod">Yöntem</label><select id="collectionMethod"><option>Nakit</option><option>Havale / EFT</option><option>Kart</option><option>Çek</option><option>Diğer</option></select></div>
+          <div class="field"><label for="collectionNote">Açıklama</label><input id="collectionNote" maxlength="160"></div>
+        </div>
+        <div class="actions"><button class="btn" id="saveCollection">Tahsilatı Kaydet</button></div>
+      </section>
+      <section class="card"><div class="card-title">Müşteri Bakiyeleri</div><div id="accountCustomerList"></div></section>
+      <section class="card" id="ledgerCard" hidden><div class="card-title">Cari Hareketler</div><div id="ledgerHeader" class="notice info"></div><div id="ledgerList" style="margin-top:10px"></div></section>
+      <section class="card"><div class="card-title">Tahsilat Geçmişi</div><div id="collectionList"></div></section>
+    </section>
+
+    <section class="page" id="backupPage">
+      <div class="page-head"><div><h2>Yedekleme & Sistem</h2><p>Veriler tek sürümlü dosyada dışa aktarılır. v9/v2 yedekleri içe aktarılabilir.</p></div></div>
+      <section class="card">
+        <div class="card-title">Veri Yedeği</div>
+        <div class="notice warn">Geri yükleme mevcut uygulama verisinin yerine geçer. Önce güncel yedek alın.</div>
+        <div class="actions"><button class="btn" id="exportBackup">Yedeği İndir</button><button class="btn secondary" id="importBackupBtn">Yedeği Geri Yükle</button></div>
+        <input id="importBackup" type="file" accept="application/json,.json" hidden>
+      </section>
+      <section class="card">
+        <div class="card-title">Sistem Durumu</div>
+        <div class="row"><span>Veri şeması</span><span class="value">v10</span></div>
+        <div class="row"><span>Depolama katmanı</span><span class="value" id="storageEngine">Web LocalStorage</span></div>
+        <div class="row"><span>Ürün</span><span class="value" id="diagProducts">0</span></div>
+        <div class="row"><span>Müşteri</span><span class="value" id="diagCustomers">0</span></div>
+        <div class="row"><span>Satış fişi</span><span class="value" id="diagSales">0</span></div>
+        <div class="actions"><button class="btn secondary" id="runDiagnostics">Veri Tutarlılığını Kontrol Et</button></div>
+        <div id="diagnosticResult" class="helper"></div>
+      </section>
+      <section class="card">
+        <div class="card-title">Android Geçiş Notu</div>
+        <div class="notice info">Arayüz mobil önceliklidir ve veri erişimi tek <span class="kbd">StorageAdapter</span> katmanından yapılır. Capacitor paketi içinde aynı kod kullanılabilir. Üretim Android sürümünde yoğun veri için LocalStorage yerine SQLite adaptörü eklenmesi önerilir.</div>
+      </section>
+    </section>
+  </main>
+</div>
+
+<div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+
+<dialog id="confirmDialog">
+  <div class="dialog-body">
+    <div class="dialog-head"><h3 id="confirmTitle">Onay</h3><button class="xbtn" id="confirmClose">×</button></div>
+    <div id="confirmText" class="notice"></div>
+    <div class="actions"><button class="btn danger" id="confirmOk">Onayla</button><button class="btn secondary" id="confirmCancel">Vazgeç</button></div>
+  </div>
+</dialog>
+
+<script>
+'use strict';
+
+const APP_KEY='yagAppV10';
+const APP_NAME='yag-satis-kampanya';
+const SCHEMA_VERSION=10;
+
+const $=id=>document.getElementById(id);
+const clone=obj=>JSON.parse(JSON.stringify(obj));
+const nowIso=()=>new Date().toISOString();
+const uid=(prefix='id')=>`${prefix}_${(crypto?.randomUUID?.()||`${Date.now()}_${Math.random().toString(16).slice(2)}`).replaceAll('-','')}`;
+const n=v=>Number.isFinite(Number(v))?Number(v):0;
+const int=v=>Math.max(0,Math.floor(n(v)));
+const money=v=>n(v).toLocaleString('tr-TR',{style:'currency',currency:'TRY',minimumFractionDigits:2,maximumFractionDigits:2});
+const formatDate=v=>{try{return new Date(v).toLocaleString('tr-TR',{dateStyle:'short',timeStyle:'short'})}catch{return String(v||'')}};
+const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const normalizeText=s=>String(s||'').toLocaleLowerCase('tr-TR');
+
+const StorageAdapter={
+  async get(key){
+    try{
+      const prefs=globalThis.Capacitor?.Plugins?.Preferences;
+      if(prefs){const r=await prefs.get({key});return r?.value??null;}
+    }catch(e){console.warn('Capacitor Preferences okunamadı, LocalStorage kullanılacak.',e)}
+    try{return localStorage.getItem(key)}catch(e){console.error('LocalStorage okunamadı',e);return null}
+  },
+  async set(key,value){
+    const text=String(value);
+    try{
+      const prefs=globalThis.Capacitor?.Plugins?.Preferences;
+      if(prefs){await prefs.set({key,value:text});return;}
+    }catch(e){console.warn('Capacitor Preferences yazılamadı, LocalStorage kullanılacak.',e)}
+    localStorage.setItem(key,text);
+  },
+  async remove(key){
+    try{const prefs=globalThis.Capacitor?.Plugins?.Preferences;if(prefs){await prefs.remove({key});return;}}catch(e){console.warn(e)}
+    localStorage.removeItem(key);
+  },
+  engine(){if(globalThis.Capacitor?.Plugins?.Preferences)return 'Capacitor Preferences';if(globalThis.AndroidBridge)return 'Android WebView Yerel Veri';return 'Web LocalStorage'}
+};
+
+function defaultState(){
+  const t=nowIso();
+  return {
+    app:APP_NAME,version:SCHEMA_VERSION,createdAt:t,updatedAt:t,
+    settings:{nextReceipt:1},
+    products:{
+      prd_yari:{id:'prd_yari',brand:'Genel',name:'10W-40 Yarı Sentetik',cost:190,price:350,stock:0,active:true,createdAt:t,updatedAt:t},
+      prd_tam:{id:'prd_tam',brand:'Genel',name:'10W-40 Tam Sentetik',cost:228,price:420,stock:0,active:true,createdAt:t,updatedAt:t}
+    },customers:[],sales:[],collections:[],stockMoves:[]
+  };
+}
+
+let state=defaultState();
+let cart=[];
+let freeDraft=[];
+let selectedLedgerCustomerId='';
+
+function parseJSON(raw,fallback){try{return raw?JSON.parse(raw):fallback}catch{return fallback}}
+function getProduct(id){return state.products[id]||null}
+function activeProducts(){return Object.values(state.products).filter(p=>p&&p.active!==false).sort((a,b)=>(a.brand+' '+a.name).localeCompare(b.brand+' '+b.name,'tr'))}
+function activeCustomers(){return state.customers.filter(c=>c&&c.active!==false).sort((a,b)=>a.name.localeCompare(b.name,'tr'))}
+function getCustomer(id){return state.customers.find(c=>c.id===id)||null}
+function saleActive(s){return !!s&&!s.cancelledAt}
+function collectionActive(c){return !!c&&!c.cancelledAt}
+
+function legacyRead(key,fallback){try{return parseJSON(localStorage.getItem(key),fallback)}catch{return fallback}}
+function legacyProductIdByName(products,name){return Object.keys(products).find(id=>products[id]?.name===name)||''}
+
+function migrateLegacyBundle(bundle){
+  const base=defaultState(); const t=nowIso();
+  const oldProducts=(bundle.products&&typeof bundle.products==='object'&&!Array.isArray(bundle.products))?bundle.products:{};
+  if(Object.keys(oldProducts).length){base.products={};Object.entries(oldProducts).forEach(([id,p])=>{if(!p?.name)return;base.products[id]={id,brand:String(p.brand||String(p.name).split(' ')[0]||'Genel'),name:String(p.name),cost:Math.max(0,n(p.cost)),price:Math.max(0,n(p.price)),stock:int(p.stock),active:true,createdAt:t,updatedAt:t};});}
+  const oldCustomers=Array.isArray(bundle.customers)?bundle.customers:[];
+  const customerMap=new Map();
+  base.customers=oldCustomers.map((c,i)=>{const id=c?.id||uid('cus');customerMap.set(String(i),id);return{id,name:String(c?.name||`Müşteri ${i+1}`),phone:String(c?.phone||''),contact:String(c?.contact||''),tax:String(c?.tax||''),address:String(c?.address||''),note:String(c?.note||''),active:c?.active!==false,createdAt:t,updatedAt:t};});
+  const oldSales=Array.isArray(bundle.sales)?bundle.sales:[];
+  base.sales=oldSales.map((s,idx)=>{
+    const pid=(s.productId&&base.products[s.productId])?s.productId:legacyProductIdByName(base.products,s.product);
+    const freeItems=(Array.isArray(s.freeItems)&&s.freeItems.length?s.freeItems:(s.free? [{productId:s.freeProductId||legacyProductIdByName(base.products,s.freeProduct),qty:n(s.free),product:s.freeProduct}]:[])).map(fi=>{
+      const fpid=(fi.productId&&base.products[fi.productId])?fi.productId:legacyProductIdByName(base.products,fi.product);
+      return {productId:fpid,productName:base.products[fpid]?.name||String(fi.product||'Bedelsiz ürün'),qty:int(fi.qty),unitCost:Math.max(0,n(base.products[fpid]?.cost??s.freeUnitCost))};
+    }).filter(fi=>fi.qty>0);
+    const paid=Math.max(1,int(s.paid)||1); const unitPrice=Math.max(0,n(s.unitPrice||(n(s.revenue)/paid))); const unitCost=Math.max(0,n(s.unitCost||base.products[pid]?.cost));
+    const revenue=Math.max(0,n(s.revenue||paid*unitPrice)); const totalCost=paid*unitCost+freeItems.reduce((a,x)=>a+x.qty*x.unitCost,0);
+    const oldCid=String(s.customerId??''); const customerId=oldCid===''?'':(customerMap.get(oldCid)||''); const customer=getCustomerFrom(base,customerId);
+    return {id:uid('sal'),receiptNo:`LEGACY-${String(idx+1).padStart(4,'0')}`,customerId,customerName:String(s.customerName||customer?.name||''),paymentMethod:s.paymentMethod||'cash',paymentLabel:s.paymentLabel||paymentLabel(s.paymentMethod||'cash'),paidAmount:Math.max(0,n(s.paidAmount)),balance:Math.max(0,n(s.balance??revenue-n(s.paidAmount))),note:'v9 verisinden aktarıldı',revenue,totalCost,profit:n(s.profit??revenue-totalCost),createdAt:legacyDateToIso(s.timestamp,s.date),cancelledAt:null,items:[{productId:pid,productName:base.products[pid]?.name||String(s.product||'Ürün'),paidQty:paid,unitPrice,unitCost,freeItems,revenue,totalCost,profit:revenue-totalCost}]};
+  });
+  const oldCollections=Array.isArray(bundle.collections)?bundle.collections:[];
+  base.collections=oldCollections.map(c=>{const oldCid=String(c.customerId??'');const customerId=customerMap.get(oldCid)||'';return{id:uid('col'),customerId,customerName:String(c.customerName||getCustomerFrom(base,customerId)?.name||''),amount:Math.max(0,n(c.amount)),method:String(c.method||'Nakit'),note:String(c.note||''),createdAt:legacyDateToIso(c.timestamp,c.date),cancelledAt:null};});
+  const oldMoves=Array.isArray(bundle.stockMoves)?bundle.stockMoves:[];
+  base.stockMoves=oldMoves.map(m=>{const pid=(m.productId&&base.products[m.productId])?m.productId:legacyProductIdByName(base.products,m.product);return{id:uid('mov'),productId:pid,productName:base.products[pid]?.name||String(m.product||''),change:n(m.change),type:String(m.type||'Eski hareket'),before:n(m.before),after:n(m.after),note:'v9 verisinden aktarıldı',refId:'',createdAt:legacyDateToIso(m.timestamp,m.date)};});
+  base.settings.nextReceipt=Math.max(1,base.sales.length+1);base.updatedAt=t;return base;
+}
+function getCustomerFrom(st,id){return st.customers.find(c=>c.id===id)||null}
+function legacyDateToIso(ts,text){if(n(ts)>0)return new Date(n(ts)).toISOString();if(text){const d=new Date(text);if(!Number.isNaN(d.getTime()))return d.toISOString()}return nowIso()}
+
+async function loadState(){
+  const raw=await StorageAdapter.get(APP_KEY);
+  if(raw){const parsed=parseJSON(raw,null);if(parsed?.version===SCHEMA_VERSION&&parsed?.products){state=normalizeState(parsed);return;}}
+  const legacy={products:legacyRead('yagProducts',null),customers:legacyRead('yagCustomers',[]),sales:legacyRead('yagSales',[]),collections:legacyRead('yagCollections',[]),stockMoves:legacyRead('yagStockMoves',[])};
+  const hasLegacy=(legacy.products&&Object.keys(legacy.products).length)||legacy.customers.length||legacy.sales.length||legacy.collections.length||legacy.stockMoves.length;
+  state=hasLegacy?migrateLegacyBundle(legacy):defaultState();await persist();
+  if(hasLegacy)toast('Eski v9 verileri v10 veri modeline aktarıldı.','success',5000);
+}
+function normalizeState(s){
+  const base={...defaultState(),...s};base.version=SCHEMA_VERSION;base.app=APP_NAME;base.settings={nextReceipt:1,...(s.settings||{})};base.products=(s.products&&typeof s.products==='object')?s.products:{};base.customers=Array.isArray(s.customers)?s.customers:[];base.sales=Array.isArray(s.sales)?s.sales:[];base.collections=Array.isArray(s.collections)?s.collections:[];base.stockMoves=Array.isArray(s.stockMoves)?s.stockMoves:[];return base;
+}
+async function persist(){state.updatedAt=nowIso();await StorageAdapter.set(APP_KEY,JSON.stringify(state));}
+
+function toast(message,type='',ms=2800){const el=document.createElement('div');el.className=`toast ${type}`;el.textContent=message;$('toastWrap').appendChild(el);setTimeout(()=>el.remove(),ms)}
+function paymentLabel(method){return method==='card'?'Kredi Kartı':method==='credit'?'Cari / Vadeli':'Peşin / Nakit'}
+function stockClass(stock){return stock<=0?'stock-zero':stock<=5?'stock-low':'stock-positive'}
+function receiptNo(){const seq=Math.max(1,int(state.settings.nextReceipt)||1);const d=new Date();const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const day=String(d.getDate()).padStart(2,'0');return `YK-${y}${m}${day}-${String(seq).padStart(4,'0')}`}
+
+const navItems=[
+  ['salePage','▣','Yeni Satış'],['stockPage','▤','Stok Yönetimi'],['productsPage','＋','Ürünler'],['customersPage','●','Müşteriler'],['salesPage','≡','Satış Geçmişi'],['accountPage','₺','Cari / Muhasebe'],['backupPage','⇩','Yedekleme & Sistem']
+];
+function buildNav(){for(const target of ['desktopNav','mobileNav']){$(target).innerHTML=navItems.map(([id,icon,label],i)=>`<button class="nav-btn ${i===0?'active':''}" data-page="${id}"><span class="nav-icon">${icon}</span>${label}</button>`).join('');$(target).querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));}}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===id));closeDrawer();if(id==='stockPage')renderStock();if(id==='productsPage')renderProductList();if(id==='customersPage')renderCustomers();if(id==='salesPage')renderSales();if(id==='accountPage')renderAccounts();if(id==='backupPage')renderDiagnosticsSummary();window.scrollTo({top:0,behavior:'smooth'});}
+function openDrawer(){$('drawer').classList.add('open');$('drawerOverlay').classList.add('open')}
+function closeDrawer(){$('drawer').classList.remove('open');$('drawerOverlay').classList.remove('open')}
+
+function fillSelect(el,items,{placeholder='',valueKey='id',labelFn=x=>x.name,keepValue=true}={}){if(!el)return;const prev=keepValue?el.value:'';el.innerHTML=placeholder?`<option value="">${escapeHtml(placeholder)}</option>`:'';items.forEach(x=>{const o=document.createElement('option');o.value=String(x[valueKey]);o.textContent=labelFn(x);el.appendChild(o)});if([...el.options].some(o=>o.value===prev))el.value=prev;}
+function renderSelectors(){
+  const customers=activeCustomers(); const products=activeProducts();
+  fillSelect($('saleCustomer'),customers,{placeholder:'Genel / Perakende Satış'});
+  fillSelect($('collectionCustomer'),customers,{placeholder:'Müşteri seçin'});
+  fillSelect($('salesCustomerFilter'),customers,{placeholder:'Tüm müşteriler'});
+  const brands=[...new Set(products.map(p=>p.brand||'Genel'))].sort((a,b)=>a.localeCompare(b,'tr'));const brandPrev=$('brand').value;$('brand').innerHTML=brands.map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');if(brands.includes(brandPrev))$('brand').value=brandPrev;
+  renderProductSelector();
+  fillSelect($('stockProduct'),products,{labelFn:p=>`${p.brand} • ${p.name}`});
+}
+function renderProductSelector(){const brand=$('brand').value;const list=activeProducts().filter(p=>!brand||p.brand===brand);fillSelect($('product'),list,{labelFn:p=>p.name});loadSaleProduct();}
+function loadSaleProduct(){const p=getProduct($('product').value);if(!p){$('cost').value='';$('price').value='';$('stockStatus').value='ÜRÜN YOK';renderSalePreview();return;}$('cost').value=p.cost.toFixed(2);$('price').value=p.price.toFixed(2);renderSalePreview();}
+
+function draftNeeds({includeCart=false}={}){const need={};if(includeCart){for(const line of cart){need[line.productId]=(need[line.productId]||0)+line.paidQty;for(const fi of line.freeItems)need[fi.productId]=(need[fi.productId]||0)+fi.qty;}}const pid=$('product').value;const qty=Math.max(1,int($('saleQty').value)||1);if(pid)need[pid]=(need[pid]||0)+qty;for(const fi of freeDraft)need[fi.productId]=(need[fi.productId]||0)+Math.max(1,int(fi.qty)||1);return need;}
+function renderSalePreview(){
+  const p=getProduct($('product').value);const qty=Math.max(1,int($('saleQty').value)||1);const price=Math.max(0,n($('price').value));const cost=Math.max(0,n($('cost').value));const freeCost=freeDraft.reduce((a,fi)=>a+Math.max(1,int(fi.qty)||1)*n(getProduct(fi.productId)?.cost),0);const freeQty=freeDraft.reduce((a,fi)=>a+Math.max(1,int(fi.qty)||1),0);const revenue=qty*price;const totalCost=qty*cost+freeCost;const profit=revenue-totalCost;
+  $('freeTotal').value=`${freeQty} adet`;$('previewStock').textContent=`${p?.stock??0} adet`;$('previewDelivery').textContent=`${qty+freeQty} adet`;$('previewRevenue').textContent=money(revenue);$('previewProfit').textContent=money(profit);$('previewProfit').className=`v ${profit>=0?'good':'bad'}`;
+  const need=draftNeeds({includeCart:true});const shortage=Object.entries(need).find(([id,q])=>n(getProduct(id)?.stock)<q);$('stockStatus').value=shortage?'YETERSİZ STOK':'STOK YETERLİ';$('stockStatus').className=shortage?'stock-zero':'stock-positive';
+}
+function renderFreeDraft(){const products=activeProducts();const box=$('freeItems');box.innerHTML='';freeDraft.forEach((fi,i)=>{const row=document.createElement('div');row.className='free-row';row.innerHTML=`<select data-free-product="${i}">${products.map(p=>`<option value="${escapeHtml(p.id)}" ${p.id===fi.productId?'selected':''}>${escapeHtml(p.name)}</option>`).join('')}</select><input data-free-qty="${i}" type="number" min="1" step="1" value="${Math.max(1,int(fi.qty)||1)}"><button class="btn danger" data-free-remove="${i}" aria-label="Bedelsiz ürünü kaldır">×</button>`;box.appendChild(row)});
+  box.querySelectorAll('[data-free-product]').forEach(el=>el.addEventListener('change',e=>{freeDraft[Number(e.target.dataset.freeProduct)].productId=e.target.value;renderSalePreview()}));box.querySelectorAll('[data-free-qty]').forEach(el=>el.addEventListener('input',e=>{freeDraft[Number(e.target.dataset.freeQty)].qty=Math.max(1,int(e.target.value)||1);renderSalePreview()}));box.querySelectorAll('[data-free-remove]').forEach(el=>el.addEventListener('click',e=>{freeDraft.splice(Number(e.target.dataset.freeRemove),1);renderFreeDraft();renderSalePreview()}));renderSalePreview();
+}
+
+function makeCartLine(){const p=getProduct($('product').value);if(!p)return null;const paidQty=Math.max(1,int($('saleQty').value)||1);const unitPrice=Math.max(0,n($('price').value));const unitCost=Math.max(0,n($('cost').value));const freeItems=freeDraft.map(fi=>{const fp=getProduct(fi.productId);return{productId:fi.productId,productName:fp?.name||'Ürün',qty:Math.max(1,int(fi.qty)||1),unitCost:Math.max(0,n(fp?.cost))};});const revenue=paidQty*unitPrice;const totalCost=paidQty*unitCost+freeItems.reduce((a,x)=>a+x.qty*x.unitCost,0);return{tempId:uid('tmp'),productId:p.id,productName:p.name,brand:p.brand,paidQty,unitPrice,unitCost,freeItems,revenue,totalCost,profit:revenue-totalCost};}
+function cartTotals(){return cart.reduce((a,x)=>({revenue:a.revenue+x.revenue,cost:a.cost+x.totalCost,profit:a.profit+x.profit,delivery:a.delivery+x.paidQty+x.freeItems.reduce((s,f)=>s+f.qty,0)}),{revenue:0,cost:0,profit:0,delivery:0})}
+function renderCart(){const box=$('cartList');box.innerHTML='';if(!cart.length){$('cartEmpty').hidden=false;$('cartSummary').hidden=true;$('completeSale').disabled=true;updatePayment();renderSalePreview();return}$('cartEmpty').hidden=true;$('cartSummary').hidden=false;$('completeSale').disabled=false;cart.forEach((x,i)=>{const el=document.createElement('div');el.className='cart-item';const free=x.freeItems.length?x.freeItems.map(f=>`${escapeHtml(f.productName)} × ${f.qty}`).join(' • '):'Yok';el.innerHTML=`<div class="item-head"><div><div class="item-title">${escapeHtml(x.productName)}</div><div class="meta">${x.paidQty} ücretli • Bedelsiz: ${free}</div></div><div class="item-amount">${money(x.revenue)}</div></div><div class="meta">Maliyet: ${money(x.totalCost)} • Kâr: <strong class="${x.profit>=0?'profit':'negative'}">${money(x.profit)}</strong></div><div class="actions"><button class="btn secondary" data-cart-edit="${i}">Düzenle</button><button class="btn danger" data-cart-remove="${i}">Sepetten Sil</button></div>`;box.appendChild(el)});const t=cartTotals();$('cartLineCount').textContent=String(cart.length);$('cartDelivery').textContent=`${t.delivery} adet`;$('cartCost').textContent=money(t.cost);$('cartRevenue').textContent=money(t.revenue);$('cartProfit').textContent=money(t.profit);box.querySelectorAll('[data-cart-remove]').forEach(b=>b.addEventListener('click',()=>{cart.splice(Number(b.dataset.cartRemove),1);renderCart()}));box.querySelectorAll('[data-cart-edit]').forEach(b=>b.addEventListener('click',()=>{const x=cart.splice(Number(b.dataset.cartEdit),1)[0];$('brand').value=x.brand;renderProductSelector();$('product').value=x.productId;$('cost').value=x.unitCost;$('price').value=x.unitPrice;$('saleQty').value=x.paidQty;freeDraft=x.freeItems.map(f=>({productId:f.productId,qty:f.qty}));renderFreeDraft();renderCart();window.scrollTo({top:120,behavior:'smooth'})}));updatePayment();renderSalePreview();}
+function addToCart(){const line=makeCartLine();if(!line){toast('Önce ürün seçin.','error');return}const need=draftNeeds({includeCart:true});const shortage=Object.entries(need).find(([id,q])=>n(getProduct(id)?.stock)<q);if(shortage){toast(`${getProduct(shortage[0])?.name||'Ürün'} için stok yetersiz. Gereken ${shortage[1]}, mevcut ${getProduct(shortage[0])?.stock||0}.`,'error',5000);return}if(line.unitPrice<=0){toast('Satış fiyatı 0’dan büyük olmalı.','error');return}cart.push(line);freeDraft=[];$('saleQty').value='1';renderFreeDraft();renderCart();toast('Ürün sepete eklendi.','success')}
+function updatePayment(){const t=cartTotals();const method=$('paymentMethod').value;const input=$('paidAmount');if(method==='cash'||method==='card'){input.readOnly=true;input.value=t.revenue.toFixed(2)}else{input.readOnly=false;if(n(input.value)>t.revenue)input.value=t.revenue.toFixed(2)}const paid=Math.max(0,n(input.value));$('balanceAmount').value=money(Math.max(0,t.revenue-paid));}
+
+function aggregateStockNeed(lines){const need={};for(const x of lines){need[x.productId]=(need[x.productId]||0)+x.paidQty;for(const f of x.freeItems)need[f.productId]=(need[f.productId]||0)+f.qty;}return need;}
+async function completeSale(){if(!cart.length)return;const customerId=$('saleCustomer').value;const method=$('paymentMethod').value;const customer=getCustomer(customerId);if(method==='credit'&&!customer){toast('Cari / vadeli satış için müşteri seçin.','error');return}const totals=cartTotals();let paidAmount=Math.max(0,n($('paidAmount').value));if(method==='cash'||method==='card')paidAmount=totals.revenue;if(paidAmount>totals.revenue){toast('Tahsilat toplam cirodan fazla olamaz.','error');return}const need=aggregateStockNeed(cart);const shortage=Object.entries(need).find(([id,q])=>n(getProduct(id)?.stock)<q);if(shortage){toast(`${getProduct(shortage[0])?.name||'Ürün'} stoğu satış için yeterli değil.`,'error');renderAll();return}
+  const saleId=uid('sal');const createdAt=nowIso();const receipt=receiptNo();
+  for(const [id,qty] of Object.entries(need)){const p=getProduct(id),before=n(p.stock);p.stock=before-qty;p.updatedAt=createdAt;state.stockMoves.push({id:uid('mov'),productId:id,productName:p.name,change:-qty,type:'Satış',before,after:p.stock,note:`${receipt} satış fişi`,refId:saleId,createdAt});}
+  state.sales.push({id:saleId,receiptNo:receipt,customerId:customer?.id||'',customerName:customer?.name||'Genel / Perakende',paymentMethod:method,paymentLabel:paymentLabel(method),paidAmount,balance:Math.max(0,totals.revenue-paidAmount),note:$('saleNote').value.trim(),revenue:totals.revenue,totalCost:totals.cost,profit:totals.profit,createdAt,cancelledAt:null,items:clone(cart)});state.settings.nextReceipt=Math.max(1,int(state.settings.nextReceipt)||1)+1;await persist();cart=[];freeDraft=[];$('saleNote').value='';$('saleQty').value='1';renderAll();toast(`${receipt} numaralı satış kaydedildi.`,'success',4500);}
+
+function customerFinancial(customerId,excludeSaleId=''){const ss=state.sales.filter(s=>saleActive(s)&&s.customerId===customerId&&s.id!==excludeSaleId);const cc=state.collections.filter(c=>collectionActive(c)&&c.customerId===customerId);const salesTotal=ss.reduce((a,s)=>a+n(s.revenue),0);const salePaid=ss.reduce((a,s)=>a+n(s.paidAmount),0);const collectionsTotal=cc.reduce((a,c)=>a+n(c.amount),0);return{salesTotal,salePaid,collectionsTotal,balance:salesTotal-salePaid-collectionsTotal};}
+function accountTotals(){const sales=state.sales.filter(s=>saleActive(s));const collections=state.collections.filter(c=>collectionActive(c));const salesTotal=sales.reduce((a,s)=>a+n(s.revenue),0);const salePaid=sales.reduce((a,s)=>a+n(s.paidAmount),0);const extra=collections.reduce((a,c)=>a+n(c.amount),0);return{sales:salesTotal,collected:salePaid+extra,balance:salesTotal-salePaid-extra};}
+
+function renderDashboard(){const today=new Date().toLocaleDateString('tr-TR');const todays=state.sales.filter(s=>saleActive(s)&&new Date(s.createdAt).toLocaleDateString('tr-TR')===today);$('todayRevenue').textContent=money(todays.reduce((a,s)=>a+n(s.revenue),0));$('todayProfit').textContent=money(todays.reduce((a,s)=>a+n(s.profit),0));$('todaySalesCount').textContent=`${todays.length} fiş`;$('topOpenBalance').textContent=money(accountTotals().balance);$('lowStockCount').textContent=String(activeProducts().filter(p=>n(p.stock)<=5).length);$('storageBadge').textContent=StorageAdapter.engine()==='Web LocalStorage'?'Yerel veri':'Android yerel veri';}
+
+function renderStock(){const products=activeProducts();fillSelect($('stockProduct'),products,{labelFn:p=>`${p.brand} • ${p.name}`});const selected=getProduct($('stockProduct').value);$('stockCurrent').value=selected?`${selected.stock} adet`:'-';const q=normalizeText($('stockSearch').value);const list=products.filter(p=>!q||normalizeText(`${p.brand} ${p.name}`).includes(q));$('stockList').innerHTML=list.length?list.map(p=>`<div class="list-item"><div class="item-head"><div><div class="item-title">${escapeHtml(p.name)}</div><div class="meta">${escapeHtml(p.brand)} • Maliyet ${money(p.cost)} • Satış ${money(p.price)}</div></div><div class="item-amount ${stockClass(p.stock)}">${p.stock} adet</div></div></div>`).join(''):'<div class="empty">Ürün bulunamadı.</div>';const moves=state.stockMoves.slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,30);$('stockMovesList').innerHTML=moves.length?moves.map(m=>`<div class="list-item"><div class="item-head"><div><div class="item-title">${escapeHtml(m.productName)}</div><div class="meta">${formatDate(m.createdAt)} • ${escapeHtml(m.type)}${m.note?' • '+escapeHtml(m.note):''}</div></div><div class="item-amount ${n(m.change)>=0?'profit':'negative'}">${n(m.change)>0?'+':''}${n(m.change)} adet</div></div><div class="meta">${n(m.before)} → ${n(m.after)} adet</div></div>`).join(''):'<div class="empty">Henüz stok hareketi yok.</div>';}
+async function updateStock(){const p=getProduct($('stockProduct').value);if(!p)return;const add=int($('stockAdd').value),remove=int($('stockRemove').value);if(!add&&!remove){toast('Stok ekleme veya çıkarma miktarı girin.','error');return}const before=n(p.stock);if(remove>before+add){toast('Çıkarılacak miktar mevcut stoktan fazla olamaz.','error');return}const change=add-remove;p.stock=before+change;p.updatedAt=nowIso();state.stockMoves.push({id:uid('mov'),productId:p.id,productName:p.name,change,type:add&&remove?'Stok düzeltme':add?'Stok girişi':'Stok çıkışı',before,after:p.stock,note:$('stockNote').value.trim(),refId:'',createdAt:nowIso()});$('stockAdd').value='';$('stockRemove').value='';$('stockNote').value='';await persist();renderAll();toast('Stok güncellendi.','success')}
+
+function resetProductForm(){$('editProductId').value='';$('productFormTitle').textContent='Yeni Ürün';$('saveProductForm').textContent='Ürünü Kaydet';$('cancelProductEdit').hidden=true;['newBrand','newName','newCost','newPrice','newStock'].forEach(id=>$(id).value='')}
+function renderProductList(){const q=normalizeText($('productSearch').value);const all=Object.values(state.products).filter(Boolean).sort((a,b)=>(a.brand+' '+a.name).localeCompare(b.brand+' '+b.name,'tr'));const list=all.filter(p=>!q||normalizeText(`${p.brand} ${p.name}`).includes(q));$('productList').innerHTML=list.length?list.map(p=>`<div class="list-item"><div class="item-head"><div><div class="item-title">${escapeHtml(p.name)} ${p.active===false?'<span class="badge">Arşiv</span>':''}</div><div class="meta">${escapeHtml(p.brand)} • Maliyet ${money(p.cost)} • Satış ${money(p.price)}</div></div><div class="item-amount ${stockClass(p.stock)}">${p.stock} adet</div></div><div class="actions"><button class="btn secondary" data-product-edit="${p.id}">Düzenle</button><button class="btn ${p.active===false?'success':'danger'}" data-product-toggle="${p.id}">${p.active===false?'Aktifleştir':'Arşivle'}</button></div></div>`).join(''):'<div class="empty">Ürün bulunamadı.</div>';$('productList').querySelectorAll('[data-product-edit]').forEach(b=>b.addEventListener('click',()=>editProduct(b.dataset.productEdit)));$('productList').querySelectorAll('[data-product-toggle]').forEach(b=>b.addEventListener('click',()=>toggleProduct(b.dataset.productToggle)));}
+function editProduct(id){const p=getProduct(id);if(!p)return;$('editProductId').value=id;$('productFormTitle').textContent='Ürünü Düzenle';$('saveProductForm').textContent='Değişiklikleri Kaydet';$('cancelProductEdit').hidden=false;$('newBrand').value=p.brand;$('newName').value=p.name;$('newCost').value=p.cost;$('newPrice').value=p.price;$('newStock').value=p.stock;showPage('productsPage');window.scrollTo({top:70,behavior:'smooth'})}
+async function saveProductForm(){const id=$('editProductId').value;const brand=$('newBrand').value.trim(),name=$('newName').value.trim(),cost=n($('newCost').value),price=n($('newPrice').value),stock=int($('newStock').value);if(!brand||!name){toast('Marka ve ürün adı zorunludur.','error');return}if(cost<0||price<0){toast('Fiyatlar negatif olamaz.','error');return}if(id){const p=getProduct(id);if(!p)return;const before=n(p.stock);Object.assign(p,{brand,name,cost,price,stock,updatedAt:nowIso()});if(before!==stock)state.stockMoves.push({id:uid('mov'),productId:id,productName:name,change:stock-before,type:'Ürün kartı stok düzeltmesi',before,after:stock,note:'Ürün düzenleme ekranından güncellendi',refId:'',createdAt:nowIso()});}else{const pid=uid('prd');state.products[pid]={id:pid,brand,name,cost,price,stock,active:true,createdAt:nowIso(),updatedAt:nowIso()};if(stock)state.stockMoves.push({id:uid('mov'),productId:pid,productName:name,change:stock,type:'Başlangıç stoku',before:0,after:stock,note:'Yeni ürün',refId:'',createdAt:nowIso()});}await persist();resetProductForm();renderAll();toast(id?'Ürün güncellendi.':'Yeni ürün eklendi.','success')}
+async function toggleProduct(id){const p=getProduct(id);if(!p)return;const goingArchive=p.active!==false;if(goingArchive){const ok=await confirmAction('Ürünü arşivle',`“${p.name}” aktif listelerden kaldırılsın mı? Geçmiş satış kayıtları korunur.`,'Arşivle');if(!ok)return}p.active=goingArchive?false:true;p.updatedAt=nowIso();await persist();renderAll();toast(goingArchive?'Ürün arşivlendi.':'Ürün aktifleştirildi.','success')}
+
+function resetCustomerForm(){$('editCustomerId').value='';$('customerFormTitle').textContent='Yeni Müşteri';$('saveCustomer').textContent='Müşteriyi Kaydet';$('cancelCustomerEdit').hidden=true;['customerName','customerPhone','customerContact','customerTax','customerAddress','customerNote'].forEach(id=>$(id).value='')}
+function renderCustomers(){const q=normalizeText($('customerSearch').value);const list=state.customers.filter(c=>c&&(!q||normalizeText(`${c.name} ${c.phone} ${c.contact}`).includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'tr'));$('customerList').innerHTML=list.length?list.map(c=>{const f=customerFinancial(c.id);return`<div class="list-item"><div class="item-head"><div><div class="item-title">${escapeHtml(c.name)} ${c.active===false?'<span class="badge">Arşiv</span>':''}</div><div class="meta">${escapeHtml(c.phone||'Telefon yok')}${c.contact?' • '+escapeHtml(c.contact):''}${c.tax?' • VKN/T.C. '+escapeHtml(c.tax):''}</div></div><div class="item-amount ${f.balance>0?'negative':'profit'}">${money(f.balance)}</div></div>${c.address?`<div class="meta">${escapeHtml(c.address)}</div>`:''}<div class="actions"><button class="btn secondary" data-customer-edit="${c.id}">Düzenle</button><button class="btn ghost" data-customer-ledger="${c.id}">Cari</button><button class="btn ${c.active===false?'success':'danger'}" data-customer-toggle="${c.id}">${c.active===false?'Aktifleştir':'Arşivle'}</button></div></div>`}).join(''):'<div class="empty">Müşteri bulunamadı.</div>';$('customerList').querySelectorAll('[data-customer-edit]').forEach(b=>b.addEventListener('click',()=>editCustomer(b.dataset.customerEdit)));$('customerList').querySelectorAll('[data-customer-ledger]').forEach(b=>b.addEventListener('click',()=>openLedger(b.dataset.customerLedger)));$('customerList').querySelectorAll('[data-customer-toggle]').forEach(b=>b.addEventListener('click',()=>toggleCustomer(b.dataset.customerToggle)));}
+function editCustomer(id){const c=getCustomer(id);if(!c)return;$('editCustomerId').value=id;$('customerFormTitle').textContent='Müşteriyi Düzenle';$('saveCustomer').textContent='Değişiklikleri Kaydet';$('cancelCustomerEdit').hidden=false;$('customerName').value=c.name;$('customerPhone').value=c.phone||'';$('customerContact').value=c.contact||'';$('customerTax').value=c.tax||'';$('customerAddress').value=c.address||'';$('customerNote').value=c.note||'';showPage('customersPage');window.scrollTo({top:70,behavior:'smooth'})}
+async function saveCustomer(){const id=$('editCustomerId').value,name=$('customerName').value.trim();if(!name){toast('Müşteri / firma adı zorunludur.','error');return}const data={name,phone:$('customerPhone').value.trim(),contact:$('customerContact').value.trim(),tax:$('customerTax').value.trim(),address:$('customerAddress').value.trim(),note:$('customerNote').value.trim(),updatedAt:nowIso()};if(id){Object.assign(getCustomer(id),data)}else{state.customers.push({id:uid('cus'),...data,active:true,createdAt:nowIso()})}await persist();resetCustomerForm();renderAll();toast(id?'Müşteri güncellendi.':'Müşteri kaydedildi.','success')}
+async function toggleCustomer(id){const c=getCustomer(id);if(!c)return;const archive=c.active!==false;if(archive){const ok=await confirmAction('Müşteriyi arşivle',`“${c.name}” yeni satış seçiminden kaldırılsın mı? Satış ve cari geçmişi korunur.`,'Arşivle');if(!ok)return}c.active=archive?false:true;c.updatedAt=nowIso();await persist();renderAll();toast(archive?'Müşteri arşivlendi.':'Müşteri aktifleştirildi.','success')}
+
+function saleSearchText(s){return normalizeText(`${s.receiptNo} ${s.customerName} ${(s.items||[]).map(i=>i.productName).join(' ')}`)}
+function renderSales(){const customerId=$('salesCustomerFilter').value,q=normalizeText($('salesSearch').value);const list=state.sales.slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).filter(s=>(!customerId||s.customerId===customerId)&&(!q||saleSearchText(s).includes(q)));$('salesList').innerHTML=list.length?list.map(s=>{const items=(s.items||[]).map(i=>`${escapeHtml(i.productName)} × ${i.paidQty}${i.freeItems?.length?' + bedelsiz '+i.freeItems.map(f=>`${escapeHtml(f.productName)} × ${f.qty}`).join(', '):''}`).join('<br>');return`<section class="card"><div class="item-head"><div><div class="item-title">${escapeHtml(s.receiptNo||'Satış')} ${s.cancelledAt?'<span class="badge danger">İptal</span>':'<span class="badge success">Tamamlandı</span>'}</div><div class="meta">${formatDate(s.createdAt)} • ${escapeHtml(s.customerName||'Genel / Perakende')} • ${escapeHtml(s.paymentLabel||paymentLabel(s.paymentMethod))}</div></div><div class="item-amount">${money(s.revenue)}</div></div><div class="notice" style="margin-top:10px">${items||'Ürün detayı yok'}</div><div class="row"><span>Tahsilat</span><span class="value">${money(s.paidAmount)}</span></div><div class="row"><span>Kalan</span><span class="value">${money(s.balance)}</span></div><div class="row"><span>Brüt kâr</span><span class="value profit">${money(s.profit)}</span></div>${s.note?`<div class="meta">Not: ${escapeHtml(s.note)}</div>`:''}${s.cancelledAt?`<div class="meta negative">İptal: ${formatDate(s.cancelledAt)}</div>`:`<div class="actions"><button class="btn danger" data-cancel-sale="${s.id}">Satışı İptal Et / Stoğu Geri Al</button></div>`}</section>`}).join(''):'<div class="empty">Filtreye uygun satış bulunamadı.</div>';$('salesList').querySelectorAll('[data-cancel-sale]').forEach(b=>b.addEventListener('click',()=>cancelSale(b.dataset.cancelSale)));}
+async function cancelSale(id){const s=state.sales.find(x=>x.id===id);if(!s||s.cancelledAt)return;if(s.customerId){const after=customerFinancial(s.customerId,s.id);if(after.balance<0){toast('Bu satış iptal edilirse müşterinin tahsilatı kalan satışları aşacak. Önce ilgili tahsilat kaydını iptal edin.','error',6000);return}}const ok=await confirmAction('Satışı iptal et',`${s.receiptNo} iptal edilecek ve bu satışta düşülen tüm ücretli/bedelsiz stoklar geri eklenecek. Bu işlem satış geçmişinde iptal olarak kalır.`,'Satışı İptal Et');if(!ok)return;const qty={};for(const i of s.items||[]){qty[i.productId]=(qty[i.productId]||0)+int(i.paidQty);for(const f of i.freeItems||[])qty[f.productId]=(qty[f.productId]||0)+int(f.qty)}const at=nowIso();for(const [pid,q] of Object.entries(qty)){const p=getProduct(pid);if(!p)continue;const before=n(p.stock);p.stock=before+q;p.updatedAt=at;state.stockMoves.push({id:uid('mov'),productId:pid,productName:p.name,change:q,type:'Satış iptali',before,after:p.stock,note:`${s.receiptNo} iptal`,refId:s.id,createdAt:at})}s.cancelledAt=at;await persist();renderAll();toast('Satış iptal edildi ve stoklar geri alındı.','success',4500)}
+
+function renderAccounts(){const t=accountTotals();$('accountSales').textContent=money(t.sales);$('accountCollected').textContent=money(t.collected);$('accountBalance').textContent=money(t.balance);const rows=state.customers.map(c=>({c,f:customerFinancial(c.id)})).filter(x=>x.f.salesTotal||x.f.salePaid||x.f.collectionsTotal).sort((a,b)=>b.f.balance-a.f.balance);$('accountCustomerCount').textContent=String(rows.length);$('accountCustomerList').innerHTML=rows.length?rows.map(({c,f})=>`<div class="list-item"><div class="item-head"><div><div class="item-title">${escapeHtml(c.name)}</div><div class="meta">Satış ${money(f.salesTotal)} • Satış anı ${money(f.salePaid)} • Sonradan ${money(f.collectionsTotal)}</div></div><div class="item-amount ${f.balance>0?'negative':'profit'}">${money(f.balance)}</div></div><div class="actions"><button class="btn secondary" data-open-ledger="${c.id}">Cari Hareketler</button></div></div>`).join(''):'<div class="empty">Henüz cari hareket yok.</div>';$('accountCustomerList').querySelectorAll('[data-open-ledger]').forEach(b=>b.addEventListener('click',()=>openLedger(b.dataset.openLedger)));const cols=state.collections.slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,40);$('collectionList').innerHTML=cols.length?cols.map(c=>`<div class="list-item"><div class="item-head"><div><div class="item-title">${escapeHtml(c.customerName)}</div><div class="meta">${formatDate(c.createdAt)} • ${escapeHtml(c.method)}${c.note?' • '+escapeHtml(c.note):''}</div></div><div class="item-amount ${c.cancelledAt?'negative':'profit'}">${c.cancelledAt?'İPTAL ':''}${money(c.amount)}</div></div>${c.cancelledAt?'':`<div class="actions"><button class="btn danger" data-cancel-collection="${c.id}">Tahsilatı İptal Et</button></div>`}</div>`).join(''):'<div class="empty">Tahsilat kaydı yok.</div>';$('collectionList').querySelectorAll('[data-cancel-collection]').forEach(b=>b.addEventListener('click',()=>cancelCollection(b.dataset.cancelCollection)));if(selectedLedgerCustomerId)renderLedger(selectedLedgerCustomerId);}
+async function saveCollection(){const customerId=$('collectionCustomer').value,c=getCustomer(customerId),amount=n($('collectionAmount').value);if(!c){toast('Müşteri seçin.','error');return}const f=customerFinancial(customerId);if(amount<=0){toast('Tahsilat 0’dan büyük olmalı.','error');return}if(amount>f.balance+0.001){toast(`Tahsilat açık bakiyeden fazla olamaz. Açık bakiye: ${money(f.balance)}`,'error');return}state.collections.push({id:uid('col'),customerId:c.id,customerName:c.name,amount,method:$('collectionMethod').value,note:$('collectionNote').value.trim(),createdAt:nowIso(),cancelledAt:null});$('collectionAmount').value='';$('collectionNote').value='';await persist();renderAll();toast('Tahsilat kaydedildi.','success')}
+async function cancelCollection(id){const c=state.collections.find(x=>x.id===id);if(!c||c.cancelledAt)return;const ok=await confirmAction('Tahsilatı iptal et',`${c.customerName} için ${money(c.amount)} tahsilat iptal edilsin mi? Cari bakiye yeniden hesaplanır.`,'Tahsilatı İptal Et');if(!ok)return;c.cancelledAt=nowIso();await persist();renderAll();toast('Tahsilat iptal edildi.','success')}
+function openLedger(customerId){selectedLedgerCustomerId=customerId;showPage('accountPage');$('ledgerCard').hidden=false;renderLedger(customerId);setTimeout(()=>$('ledgerCard').scrollIntoView({behavior:'smooth',block:'start'}),50)}
+function renderLedger(customerId){const c=getCustomer(customerId);if(!c){$('ledgerCard').hidden=true;return}const events=[];state.sales.filter(s=>saleActive(s)&&s.customerId===customerId).forEach(s=>{events.push({at:s.createdAt,label:`Satış • ${s.receiptNo}`,debit:n(s.revenue),credit:n(s.paidAmount),detail:`${s.paymentLabel} • satış anı tahsilatı ${money(s.paidAmount)}`})});state.collections.filter(x=>collectionActive(x)&&x.customerId===customerId).forEach(x=>events.push({at:x.createdAt,label:'Tahsilat',debit:0,credit:n(x.amount),detail:`${x.method}${x.note?' • '+x.note:''}`}));events.sort((a,b)=>String(a.at).localeCompare(String(b.at)));let running=0;events.forEach(e=>{running+=e.debit-e.credit;e.balance=running});const f=customerFinancial(customerId);$('ledgerHeader').innerHTML=`<strong>${escapeHtml(c.name)}</strong> • Satış ${money(f.salesTotal)} • Tahsilat ${money(f.salePaid+f.collectionsTotal)} • Kalan <strong>${money(f.balance)}</strong>`;$('ledgerList').innerHTML=events.length?events.slice().reverse().map(e=>`<div class="list-item"><div class="item-head"><div><div class="item-title">${escapeHtml(e.label)}</div><div class="meta">${formatDate(e.at)} • ${escapeHtml(e.detail)}</div></div><div class="item-amount">${e.debit?money(e.debit):'-'+money(e.credit)}</div></div><div class="meta">İşlem sonrası bakiye: <strong>${money(e.balance)}</strong></div></div>`).join(''):'<div class="empty">Cari hareket yok.</div>';}
+
+async function exportBackup(){const payload={...clone(state),exportedAt:nowIso()};const text=JSON.stringify(payload,null,2);const fileName=`yag_satis_yedek_${new Date().toISOString().slice(0,10)}.json`;if(globalThis.AndroidBridge?.saveTextFile){try{globalThis.AndroidBridge.saveTextFile(fileName,text);toast('Yedek dosyası için kayıt konumu seçin.','success');return}catch(e){console.warn('Android yedek aktarımı başarısız, web indirme kullanılacak.',e)}}const blob=new Blob([text],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fileName;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Yedek dosyası hazırlandı.','success')}
+async function importBackupFile(file){try{const text=await file.text();const data=JSON.parse(text);let imported;if(data?.version===SCHEMA_VERSION&&data?.products&&Array.isArray(data.sales)){imported=normalizeState(data)}else if(data?.app==='yag-kampanya-hesaplayici'||data?.products){imported=migrateLegacyBundle(data)}else throw new Error('Desteklenmeyen yedek');const ok=await confirmAction('Yedeği geri yükle','Mevcut v10 verisinin tamamı seçilen yedek ile değiştirilecek.','Geri Yükle');if(!ok)return;state=imported;cart=[];freeDraft=[];selectedLedgerCustomerId='';await persist();resetProductForm();resetCustomerForm();renderAll();showPage('salePage');toast('Yedek başarıyla geri yüklendi.','success',4500)}catch(e){console.error(e);toast('Yedek dosyası okunamadı veya desteklenmiyor.','error',5000)}}
+function runDiagnostics(){const issues=[];for(const p of Object.values(state.products)){if(!p.id||!p.name)issues.push('Eksik ürün kimliği/adı');if(!Number.isFinite(n(p.stock))||n(p.stock)<0)issues.push(`${p.name}: geçersiz stok`);if(n(p.cost)<0||n(p.price)<0)issues.push(`${p.name}: negatif fiyat`)}for(const s of state.sales){if(!s.id)issues.push('Kimliği olmayan satış');for(const i of s.items||[]){if(i.productId&&!state.products[i.productId])issues.push(`${s.receiptNo}: bulunamayan ürün referansı ${i.productId}`);for(const f of i.freeItems||[])if(f.productId&&!state.products[f.productId])issues.push(`${s.receiptNo}: bulunamayan bedelsiz ürün ${f.productId}`)}if(s.customerId&&!getCustomer(s.customerId))issues.push(`${s.receiptNo}: bulunamayan müşteri referansı`)}for(const c of state.collections){if(c.customerId&&!getCustomer(c.customerId))issues.push('Tahsilatta bulunamayan müşteri referansı')}$('diagnosticResult').innerHTML=issues.length?`<span class="negative"><strong>${issues.length} sorun:</strong> ${escapeHtml(issues.slice(0,8).join(' • '))}${issues.length>8?' …':''}</span>`:'<span class="profit"><strong>Tutarlı:</strong> ürün, müşteri, satış ve stok referanslarında kritik sorun bulunamadı.</span>';}
+function renderDiagnosticsSummary(){$('storageEngine').textContent=StorageAdapter.engine();$('diagProducts').textContent=String(Object.values(state.products).length);$('diagCustomers').textContent=String(state.customers.length);$('diagSales').textContent=String(state.sales.length);}
+
+function confirmAction(title,text,okLabel='Onayla'){return new Promise(resolve=>{const d=$('confirmDialog');$('confirmTitle').textContent=title;$('confirmText').textContent=text;$('confirmOk').textContent=okLabel;let done=false;const finish=v=>{if(done)return;done=true;d.close();cleanup();resolve(v)};const cleanup=()=>{$('confirmOk').removeEventListener('click',yes);$('confirmCancel').removeEventListener('click',no);$('confirmClose').removeEventListener('click',no);d.removeEventListener('cancel',cancel)};const yes=()=>finish(true),no=()=>finish(false),cancel=e=>{e.preventDefault();finish(false)};$('confirmOk').addEventListener('click',yes);$('confirmCancel').addEventListener('click',no);$('confirmClose').addEventListener('click',no);d.addEventListener('cancel',cancel);d.showModal()})}
+
+async function saveSaleProductChanges(){const p=getProduct($('product').value);if(!p)return;const cost=n($('cost').value),price=n($('price').value);if(cost<0||price<0){toast('Maliyet ve satış fiyatı negatif olamaz.','error');return}p.cost=cost;p.price=price;p.updatedAt=nowIso();await persist();renderAll();toast('Ürün fiyatları güncellendi.','success')}
+
+function renderAll(){renderSelectors();renderDashboard();renderFreeDraft();renderCart();renderStock();renderProductList();renderCustomers();renderSales();renderAccounts();renderDiagnosticsSummary();updatePayment();}
+
+function bindEvents(){
+  $('menuBtn').addEventListener('click',openDrawer);$('closeDrawer').addEventListener('click',closeDrawer);$('drawerOverlay').addEventListener('click',closeDrawer);
+  $('brand').addEventListener('change',renderProductSelector);$('product').addEventListener('change',loadSaleProduct);['cost','price','saleQty'].forEach(id=>$(id).addEventListener('input',renderSalePreview));
+  $('addFreeItem').addEventListener('click',()=>{const pid=$('product').value||activeProducts()[0]?.id;if(!pid)return;freeDraft.push({productId:pid,qty:1});renderFreeDraft()});$('addToCart').addEventListener('click',addToCart);$('clearCart').addEventListener('click',async()=>{if(!cart.length)return;const ok=await confirmAction('Sepeti temizle','Sepetteki tüm kalemler silinsin mi?','Sepeti Temizle');if(ok){cart=[];renderCart()}});$('paymentMethod').addEventListener('change',updatePayment);$('paidAmount').addEventListener('input',updatePayment);$('completeSale').addEventListener('click',completeSale);$('saveProductChanges').addEventListener('click',saveSaleProductChanges);$('goStock').addEventListener('click',()=>showPage('stockPage'));
+  $('stockProduct').addEventListener('change',renderStock);$('stockSearch').addEventListener('input',renderStock);$('updateStock').addEventListener('click',updateStock);
+  $('productSearch').addEventListener('input',renderProductList);$('saveProductForm').addEventListener('click',saveProductForm);$('cancelProductEdit').addEventListener('click',resetProductForm);
+  $('customerSearch').addEventListener('input',renderCustomers);$('saveCustomer').addEventListener('click',saveCustomer);$('cancelCustomerEdit').addEventListener('click',resetCustomerForm);
+  $('salesCustomerFilter').addEventListener('change',renderSales);$('salesSearch').addEventListener('input',renderSales);
+  $('saveCollection').addEventListener('click',saveCollection);
+  $('exportBackup').addEventListener('click',exportBackup);$('quickBackup').addEventListener('click',exportBackup);$('importBackupBtn').addEventListener('click',()=>$('importBackup').click());$('importBackup').addEventListener('change',async e=>{const f=e.target.files?.[0];if(f)await importBackupFile(f);e.target.value=''});$('runDiagnostics').addEventListener('click',runDiagnostics);
+}
+
+async function init(){buildNav();bindEvents();await loadState();$('storageEngine').textContent=StorageAdapter.engine();renderAll();}
+init().catch(e=>{console.error(e);toast('Uygulama başlatılırken hata oluştu. Tarayıcı konsolunu kontrol edin.','error',7000)});
+</script>
+</body>
+</html>

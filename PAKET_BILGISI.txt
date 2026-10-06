@@ -1,0 +1,12 @@
+YAG SATIS ANDROID v1.0.0
+========================
+Uygulama: Yağ Satış
+Application ID: com.yagsatis.mobile
+Minimum Android: 7.0 (API 24)
+Target SDK: 35
+Kaynak çekirdek: Yağ Satış & Kampanya Yönetimi v10
+
+APK üretmek için: build-apk.bat
+USB ile kurmak için: install-phone.bat
+Ana web uygulaması: app/src/main/assets/index.html
+Android ana kodu: app/src/main/java/com/yagsatis/mobile/MainActivity.java
