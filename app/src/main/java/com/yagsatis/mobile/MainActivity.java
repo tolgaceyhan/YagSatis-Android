@@ -3,6 +3,9 @@ package com.yagsatis.mobile;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.Manifest;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -43,6 +46,10 @@ public class MainActivity extends Activity {
         setContentView(webView);
 
         database = new AppDatabaseHelper(getApplicationContext());
+        ReminderScheduler.ensureChannel(this);
+        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 2001);
+        }
         database.getWritableDatabase();
 
         WebSettings settings = webView.getSettings();
@@ -171,6 +178,12 @@ public class MainActivity extends Activity {
             } catch (Exception e) {
                 return false;
             }
+        }
+
+        @JavascriptInterface
+        public void syncDueReminders(String remindersJson) {
+            if (remindersJson == null) return;
+            ReminderScheduler.sync(MainActivity.this, remindersJson);
         }
 
         @JavascriptInterface
