@@ -37,6 +37,8 @@ jobs:
           test -f app/build.gradle || (echo "HATA: app/build.gradle bulunamadi" && exit 1)
           test -f app/src/main/AndroidManifest.xml || (echo "HATA: AndroidManifest.xml bulunamadi" && exit 1)
           test -f app/src/main/java/com/yagsatis/mobile/AppDatabaseHelper.java || (echo "HATA: AppDatabaseHelper.java bulunamadi" && exit 1)
+          test -f app/src/main/res/mipmap-xxxhdpi/ic_launcher_logo.png || (echo "HATA: launcher logo bulunamadi" && exit 1)
+          test -f app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml || (echo "HATA: adaptive launcher icon bulunamadi" && exit 1)
 
       - name: Gradle 8.9 kur
         uses: gradle/actions/setup-gradle@v6
@@ -123,17 +125,17 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/release/app-release.apk dist/YagSatis-v1.2.1-release.apk
-          cp app/build/outputs/bundle/release/app-release.aab dist/YagSatis-v1.2.1-release.aab
+          cp app/build/outputs/apk/release/app-release.apk dist/YagSatis-v1.2.2-release.apk
+          cp app/build/outputs/bundle/release/app-release.aab dist/YagSatis-v1.2.2-release.aab
           sha256sum dist/* > dist/SHA256SUMS.txt
 
       - name: Release dosyalarini artifact olarak yukle
         uses: actions/upload-artifact@v4
         with:
-          name: YagSatis-Android-SIGNED-v1.2.1
+          name: YagSatis-Android-SIGNED-v1.2.2
           path: |
-            dist/YagSatis-v1.2.1-release.apk
-            dist/YagSatis-v1.2.1-release.aab
+            dist/YagSatis-v1.2.2-release.apk
+            dist/YagSatis-v1.2.2-release.aab
             dist/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 90
